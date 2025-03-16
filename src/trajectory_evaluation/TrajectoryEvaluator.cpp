@@ -229,7 +229,7 @@ namespace dynamic_gap
         float cost = (std::max(relVel.dot(relativeGapPos), 0.0f) + robotVel.norm() + 1) / relativeGapPos.norm();
         
         // ROS_ERROR_STREAM_NAMED("relvel cost", "std::max(relVel.dot(relativeGapPos), 0.0f");
-        // ROS_ERROR_STREAM_NAMED("relvel cost", std::max(relVel.dot(relativeGapPos), 0.0f));
+        // ROS_ERROR_STREAM_NAMED("relvel cost", std::max(relVel.dot(relativeGapPos), 0.0f)); //idk if this is useful for anything - 0316
 
         // ROS_ERROR_STREAM_NAMED("relvel cost", "relVel.dot(relativeGapPos)");
         // ROS_ERROR_STREAM_NAMED("relvel cost", relVel.dot(relativeGapPos));
@@ -237,8 +237,8 @@ namespace dynamic_gap
         ROS_ERROR_STREAM_NAMED("trajEst", "relVel");
         ROS_ERROR_STREAM_NAMED("trajEst", relVel);
 
-        ROS_ERROR_STREAM_NAMED("relativeGapPos", "relativeGapPos");
-        ROS_ERROR_STREAM_NAMED("relativeGapPos", relativeGapPos);
+        // ROS_ERROR_STREAM_NAMED("relativeGapPos", "relativeGapPos");
+        // ROS_ERROR_STREAM_NAMED("relativeGapPos", relativeGapPos);
         
         // ROS_ERROR_STREAM_NAMED("GapTrajectoryGenerator", "relativeVelocityCost() !!UNWEIGHTED!! cost: ");
         // ROS_ERROR_STREAM_NAMED("GapTrajectoryGenerator", cost);

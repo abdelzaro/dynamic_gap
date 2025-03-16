@@ -105,15 +105,15 @@ namespace dynamic_gap
             virtual Eigen::Vector2f getRbtVel() const = 0; //TODO get rid of this function because  getRobotVel() already exists 
 
             /**
-            
+                \brief function for determining if a gap pt is static (BASED ON RELATIVE VELOCITY!). important note: relative velocity is only zero when the two agents are not moving or if they're moving at same velocity. Also the expectation is that you're using perfectEstimator
              */
             void updateGapPtIsStatic()
             {
                 Eigen::Vector2f gapVel = xFrozen_.tail(2);
-                float isDynamicThres = 0.1; 
+                float isDynamicThres = 0.2; 
                 gapPtIsStatic_ = (gapVel.norm() <= isDynamicThres);
-                ROS_ERROR_STREAM_NAMED(" estimator ", "gapVel.norm()");
-                ROS_ERROR_STREAM_NAMED(" estimator ", gapVel.norm());
+                // ROS_ERROR_STREAM_NAMED(" estimator ", "gapVel.norm()");
+                // ROS_ERROR_STREAM_NAMED(" estimator ", gapVel.norm());
 
 
             }

@@ -65,7 +65,7 @@ namespace dynamic_gap
         // Eigen::Vector2f leftGapRelVel = RbtVel + leftGapRelVel;// TODO: delete this it's unused
         }
 
-        if(rightPtIsStatic)
+        if(!rightPtIsStatic)
         {
         gap->rightGapPtModel_->isolateGapDynamics();
         rightGapRelVel = gap->rightGapPtModel_->getGapVelocity();
@@ -108,7 +108,7 @@ namespace dynamic_gap
             // std::cout << "regular range at " << i << ": ";
             
             if(!leftPtIsStatic){leftGapCost = relativeVelocityCost(leftGapRelVel, leftGapRelPos, RbtVel);}
-            if(rightPtIsStatic){rightGapCost = relativeVelocityCost(rightGapRelVel, rightGapRelPos, RbtVel);}
+            if(!rightPtIsStatic){rightGapCost = relativeVelocityCost(rightGapRelVel, rightGapRelPos, RbtVel);}
         
             posewiseCosts.at(i) = evaluatePose(path.poses.at(i), futureScans.at(i)) + relVelWeight * leftGapCost + relVelWeight * rightGapCost; //  / posewiseCosts.size()
             // ROS_ERROR_STREAM_NAMED("GapTrajectoryGenerator", "left leftGapCost: ");
