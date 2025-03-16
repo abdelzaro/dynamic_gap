@@ -231,8 +231,8 @@ namespace dynamic_gap
         // ROS_ERROR_STREAM_NAMED("relvel cost", "std::max(relVel.dot(relativeGapPos), 0.0f");
         // ROS_ERROR_STREAM_NAMED("relvel cost", std::max(relVel.dot(relativeGapPos), 0.0f));
 
-        ROS_ERROR_STREAM_NAMED("relvel cost", "relVel.dot(relativeGapPos)");
-        ROS_ERROR_STREAM_NAMED("relvel cost", relVel.dot(relativeGapPos));
+        // ROS_ERROR_STREAM_NAMED("relvel cost", "relVel.dot(relativeGapPos)");
+        // ROS_ERROR_STREAM_NAMED("relvel cost", relVel.dot(relativeGapPos));
 
         ROS_ERROR_STREAM_NAMED("trajEst", "relVel");
         ROS_ERROR_STREAM_NAMED("trajEst", relVel);
