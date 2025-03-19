@@ -24,105 +24,21 @@ namespace dynamic_gap
     void TrajectoryEvaluator::evaluateTrajectory(const dynamic_gap::Trajectory & traj,
                                                 std::vector<float> & posewiseCosts,
                                                 float & terminalPoseCost,
-                                                const std::vector<sensor_msgs::LaserScan> & futureScans, 
-                                                const dynamic_gap::Gap* gap, 
-                                                int i)  //TODO: get rid of i it's just ofr debugging 
+                                                const std::vector<sensor_msgs::LaserScan> & futureScans) 
     {    
         ROS_INFO_STREAM_NAMED("GapTrajectoryGenerator", "         [evaluateTrajectory()]");
-        // ROS_ERROR_STREAM_NAMED("GapTrajectoryGenerator", i);
-        
-        Eigen::Vector2f leftGapRelVel(0, 0);
-        Eigen::Vector2f RbtVel(0, 0);
-        Eigen::Vector2f leftGapRelPos(0, 0);
-        Eigen::Vector2f rightGapRelVel(0, 0);
-        Eigen::Vector2f rightGapRelPos(0, 0);
-        bool leftPtIsStatic = true; 
-        bool rightPtIsStatic = true; 
-
-        if(gap){ // if a gap is provided 
-        gap->leftGapPtModel_->updateGapPtIsStatic();
-        gap->rightGapPtModel_->updateGapPtIsStatic();
-        leftPtIsStatic = gap->leftGapPtModel_->getGapPtIsStatic();
-        rightPtIsStatic = gap->rightGapPtModel_->getGapPtIsStatic();
-
-        ROS_ERROR_STREAM_NAMED(" ", "gap->leftGapPtModel_->getGapPtIsStatic()");
-        ROS_ERROR_STREAM_NAMED(" ", gap->leftGapPtModel_->getGapPtIsStatic());
-
-        ROS_ERROR_STREAM_NAMED(" ", "gap->rightGapPtModel_->getGapPtIsStatic()");
-        ROS_ERROR_STREAM_NAMED(" ", gap->rightGapPtModel_->getGapPtIsStatic());
-
-        if(!leftPtIsStatic)
-        {
-        gap->leftGapPtModel_->isolateGapDynamics();
-         leftGapRelVel = gap->leftGapPtModel_->getGapVelocity();
-         RbtVel = gap->leftGapPtModel_->getRbtVel();
-        // ROS_ERROR_STREAM_NAMED("evalTraj", "leftGapRelVel: ");
-        // ROS_ERROR_STREAM_NAMED("evalTraj", leftGapRelVel);  
-         leftGapRelPos = gap->leftGapPtModel_->getState().head<2>(); //distance from robot to gap.
-        // ROS_ERROR_STREAM_NAMED("evalTraj", "gap->leftGapPtModel_->getState(): ");
-        // ROS_ERROR_STREAM_NAMED("evalTraj", leftGapRelPos);  
-
-        // Eigen::Vector2f leftGapRelVel = RbtVel + leftGapRelVel;// TODO: delete this it's unused
-        }
-
-        if(!rightPtIsStatic)
-        {
-        gap->rightGapPtModel_->isolateGapDynamics();
-        rightGapRelVel = gap->rightGapPtModel_->getGapVelocity();
-        // ROS_ERROR_STREAM_NAMED("evalTraj", "rightGapRelVel: ");
-        // ROS_ERROR_STREAM_NAMED("evalTraj", rightGapRelVel);
-        rightGapRelPos = gap->rightGapPtModel_->getState().head<2>(); //distance from robot to gap.
-        // ROS_ERROR_STREAM_NAMED("evalTraj", "gap->rightGapPtModel_->getState(): ");
-        // ROS_ERROR_STREAM_NAMED("evalTraj", rightGapRelPos);  
-
-        // Eigen::Vector2f rightGapRelVel = RbtVel + rightGapRelVel; // TODO: delete this it's unused
-
-        // Eigen::Vector2f avgGapRelVel = (leftGapRelVel + rightGapRelVel)/2;// TODO: delete this it's unused
-
-
-       
-        // ROS_ERROR_STREAM_NAMED("evalTraj", "(leftGapRelVel + rightGapRelVel)/2");         
-        // ROS_ERROR_STREAM_NAMED("evalTraj", avgGapRelVel);         
-
-
-
-        // if (i==1){
-        // ROS_ERROR_STREAM_NAMED("evalTraj", "for i=1 only: evaluateTrajectory containing RbtVel + gapVelocity: "); 
-        // ROS_ERROR_STREAM_NAMED("evalTraj", leftGapRelVel);
-        // }
-        // // ROS_ERROR_STREAM_NAMED("evalTraj", "perfect estimator used, evaluateTrajectory containing gapVelocity: "); 
-        // // ROS_ERROR_STREAM_NAMED("evalTraj", gapVelocity); 
-        }
-        }
-        
         // Requires LOCAL FRAME
+
         geometry_msgs::PoseArray path = traj.getPathRbtFrame();
         std::vector<float> pathTiming = traj.getPathTiming();
         
         posewiseCosts = std::vector<float>(path.poses.size());
-        float leftGapCost = 0; 
-        float rightGapCost = 0; 
-        float relVelWeight = .1; //TODO: add this to cfg
+
         for (int i = 0; i < posewiseCosts.size(); i++) 
         {
             // std::cout << "regular range at " << i << ": ";
-            
-            if(!leftPtIsStatic){leftGapCost = relativeVelocityCost(leftGapRelVel, leftGapRelPos, RbtVel);}
-            if(!rightPtIsStatic){rightGapCost = relativeVelocityCost(rightGapRelVel, rightGapRelPos, RbtVel);}
-        
-            posewiseCosts.at(i) = evaluatePose(path.poses.at(i), futureScans.at(i)) + relVelWeight * leftGapCost + relVelWeight * rightGapCost; //  / posewiseCosts.size()
-            // ROS_ERROR_STREAM_NAMED("GapTrajectoryGenerator", "left leftGapCost: ");
-            // ROS_ERROR_STREAM_NAMED("GapTrajectoryGenerator", leftGapCost);
-
-            // ROS_ERROR_STREAM_NAMED("GapTrajectoryGenerator", "right rightGapCost: ");
-            // ROS_ERROR_STREAM_NAMED("GapTrajectoryGenerator", rightGapCost);
-
-
-
-            // ROS_ERROR_STREAM_NAMED("GapTrajectoryGenerator", "leftGapCost to evaluatePose() ");
-
-            // ROS_ERROR_STREAM_NAMED("GapTrajectoryGenerator", "           pose " << i << " score: " << posewiseCosts.at(i));
-
+            posewiseCosts.at(i) = evaluatePose(path.poses.at(i), futureScans.at(i)); //  / posewiseCosts.size()
+            ROS_INFO_STREAM_NAMED("GapTrajectoryGenerator", "           pose " << i << " score: " << posewiseCosts.at(i));
         }
         float totalTrajCost = std::accumulate(posewiseCosts.begin(), posewiseCosts.end(), float(0));
         ROS_INFO_STREAM_NAMED("GapTrajectoryGenerator", "             pose-wise cost: " << totalTrajCost);
@@ -213,28 +129,4 @@ namespace dynamic_gap
 
         return cfg_->traj.Q * std::exp(-cfg_->traj.pen_exp_weight * inflRbtToScanDist);
     }
-
-    float TrajectoryEvaluator::relativeVelocityCost(Eigen::Vector2f relativeVel,
-                                                Eigen::Vector2f relativeGapPos,
-                                                Eigen::Vector2f robotVel)
-    {
-        Eigen::Vector2f relVel = -relativeVel; // so velocity and position vector point in the same direction for the dot product
-        
-        // ROS_ERROR_STREAM_NAMED("relvel cost: ", relVel << ", relativeGapPos: " << relativeGapPos << ", robotVel: " << robotVel);
-
-        float cost = (std::max(relVel.dot(relativeGapPos), 0.0f) + robotVel.norm() + 1) / relativeGapPos.norm();
-        
-        // ROS_ERROR_STREAM_NAMED("relvel cost", "std::max(relVel.dot(relativeGapPos), 0.0f");
-        // ROS_ERROR_STREAM_NAMED("relvel cost", std::max(relVel.dot(relativeGapPos), 0.0f));
-
-        // ROS_ERROR_STREAM_NAMED("relvel cost", "relVel.dot(relativeGapPos)");
-        // ROS_ERROR_STREAM_NAMED("relvel cost", relVel.dot(relativeGapPos));
-        
-        // ROS_ERROR_STREAM_NAMED("GapTrajectoryGenerator", "relativeVelocityCost() !!UNWEIGHTED!! cost: ");
-        // ROS_ERROR_STREAM_NAMED("GapTrajectoryGenerator", cost);
-
-    return cost;
-    }
-
-
 }
